@@ -40,8 +40,8 @@ public interface SysCodeService extends IService<SysCode> {
     /**
      * 删除配置
      *
-     * @param code
+     * @param id
      * @return
      */
-    void deleteSysCode(String code);
+    void deleteSysCode(String id);
 }

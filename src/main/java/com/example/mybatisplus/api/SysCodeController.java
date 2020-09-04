@@ -1,7 +1,9 @@
 package com.example.mybatisplus.api;
 
+import com.example.mybatisplus.convert.SysConfigConverter;
 import com.example.mybatisplus.pojo.SysCode;
 import com.example.mybatisplus.pojo.bo.SysCodeBO;
+import com.example.mybatisplus.pojo.vo.SysCodeVO;
 import com.example.mybatisplus.result.Result;
 import com.example.mybatisplus.service.SysCodeService;
 import io.swagger.annotations.Api;
@@ -17,7 +19,7 @@ import java.util.Objects;
  */
 @Api(value = "国际化配置服务", tags = {"用于国际化配置服务相关接口"})
 @RestController
-@RequestMapping("users")
+@RequestMapping("sysConfig")
 public class SysCodeController {
 
     @Resource
@@ -25,17 +27,19 @@ public class SysCodeController {
 
 
     @ApiOperation(value = "新增配置", notes = "新增配置", httpMethod = "POST")
-    @PostMapping("/register")
+    @PostMapping("/add")
     public Result createUser(SysCodeBO sysCodeBO) {
         SysCode sysCode = sysCodeService.createSysCode(sysCodeBO);
         if (Objects.isNull(sysCode)) {
             return Result.errorMsg("创建配置失败！");
         }
-        return Result.ok(sysCode);
+
+        SysCodeVO sysCodeVO = SysConfigConverter.MAPPER.doMap(sysCode);
+        return Result.ok(sysCodeVO);
     }
 
     @ApiOperation(value = "修改配置", notes = "修改配置", httpMethod = "PUT")
-    @PostMapping("/modifyUser")
+    @PutMapping("/modify")
     public Result modifySysCode(SysCodeBO sysCodeBO) {
         try {
             sysCodeService.modifySysCode(sysCodeBO);
@@ -48,7 +52,7 @@ public class SysCodeController {
     }
 
     @ApiOperation(value = "删除配置", notes = "删除配置", httpMethod = "DELETE")
-    @DeleteMapping("/removeUser/code")
+    @DeleteMapping("/remove")
     public Result removeUser(@RequestParam("code") String code) {
         try {
             sysCodeService.deleteSysCode(code);
@@ -59,11 +63,12 @@ public class SysCodeController {
     }
 
     @ApiOperation(value = "获取配置列表", notes = "获取配置列表", httpMethod = "GET")
-    @GetMapping("/sysConfig/list")
+    @GetMapping("/list")
     public Result sysConfigList() {
         try {
             List<SysCode> sysCodes = sysCodeService.selectSysCodeList();
-            return Result.ok(sysCodes);
+            List<SysCodeVO> sysCodeVOList = SysConfigConverter.MAPPER.doMapList(sysCodes);
+            return Result.ok(sysCodeVOList);
         } catch (Exception e) {
             return Result.errorException(e.getMessage());
         }

@@ -29,21 +29,23 @@ public class LocalConfig {
     /**
      * 定义一个配置容器
      */
-    private static Map<String, SysCode> localConfigMap =Maps.newHashMap();
+    private static Map<String, Map<String,String>> localConfigMap =Maps.newHashMap();
 
     @PostConstruct
     public void initLocalConfig() {
         List<SysCode> sysCodeList = sysCodeService.selectSysCodeList();
         if (!CollectionUtils.isEmpty(sysCodeList)) {
-            localConfigMap = sysCodeList.stream().collect(Collectors.toMap(SysCode::getCode, sysCode -> sysCode, (oldVal, newVal) -> newVal));
+            localConfigMap = sysCodeList.stream()
+                    .collect(Collectors.groupingBy(SysCode::getCode,
+                            Collectors.toMap(item->item.getLocal().toLowerCase(),SysCode::getLang, (oldVal, newVal) -> newVal)));
         }
     }
 
-    public static Map<String, SysCode> getLocalConfigMap() {
+    public static Map<String,  Map<String,String>> getLocalConfigMap() {
         return localConfigMap==null?Maps.newHashMap():localConfigMap;
     }
 
-    public static void setLocalConfigMap(Map<String, SysCode> localConfigMap) {
+    public static void setLocalConfigMap(Map<String,  Map<String,String>> localConfigMap) {
         LocalConfig.localConfigMap = localConfigMap;
     }
 }

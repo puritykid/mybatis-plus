@@ -19,8 +19,6 @@ import com.example.mybatisplus.service.UserService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -32,7 +30,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- *  用户接口实现类
+ * 用户接口实现类
+ *
  * @author haha
  */
 @Service
@@ -93,12 +92,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Map<String, List<String>> userRoleMap = roleUsers.stream().collect(Collectors.groupingBy(MappingRoleuser::getUserId,
                 Collectors.mapping(MappingRoleuser::getRoleId, Collectors.toList())));
         // 角色分组Map
-        Map<String, RoleVO> roleMap = roles.stream().collect(Collectors.toMap(Role::getRoleId,role->{
+        Map<String, RoleVO> roleMap = roles.stream().collect(Collectors.toMap(Role::getRoleId, role -> {
             RoleVO roleVO = new RoleVO();
             roleVO.setRoleId(role.getRoleId());
             roleVO.setRoleName(role.getRoleName());
             return roleVO;
-        },(oldVal,newVal)->newVal));
+        }, (oldVal, newVal) -> newVal));
         List<UserHasRoleVO> list = Lists.newArrayListWithCapacity(users.size());
         users.stream().forEach(user -> {
             // 1.拼装用户数据
@@ -110,7 +109,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             // 2.拼装用户的角色数据
             List<String> roleIdList = userRoleMap.get(user.getUserId());
             List<RoleVO> roleVOS = Lists.newArrayListWithCapacity(roleIdList.size());
-            roleIdList.stream().forEach(roleId->{
+            roleIdList.stream().forEach(roleId -> {
                 RoleVO roleVO = roleMap.get(roleId);
                 roleVOS.add(roleVO);
             });
@@ -121,7 +120,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //        return list;
     }
 
-    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
     @Override
     public User createUser(UserBO userBO) {
         User user = new User();
@@ -135,7 +133,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         this.save(user);
         return user;
     }
-    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
+
+
     @Override
     public void updateUser(UpdateUserBO userBO) {
         User user = new User();
@@ -147,14 +146,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUpdatedById("001001");
         this.updateById(user);
     }
-    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
+
+
     @Override
     public void deleteUser(String userId) {
         LambdaUpdateWrapper<User> updateWrapper = Wrappers.<User>lambdaUpdate()
                 .set(User::getDeletedAt, new Date())
                 .set(User::getDeletedById, userId)
-                .set(User::isDeleted,true)
+                .set(User::isDeleted, true)
                 .eq(User::getUserId, userId);
         this.update(updateWrapper);
+
+        throw new ServiceException("1006");
     }
 }

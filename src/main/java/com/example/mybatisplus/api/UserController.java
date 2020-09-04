@@ -1,17 +1,14 @@
 package com.example.mybatisplus.api;
 
-import com.example.mybatisplus.pojo.SysCode;
 import com.example.mybatisplus.pojo.User;
 import com.example.mybatisplus.pojo.bo.UpdateUserBO;
 import com.example.mybatisplus.pojo.bo.UserBO;
 import com.example.mybatisplus.pojo.vo.UserHasRoleVO;
 import com.example.mybatisplus.result.Result;
-import com.example.mybatisplus.service.SysCodeService;
 import com.example.mybatisplus.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -26,7 +23,7 @@ import java.util.Objects;
 @RequestMapping("users")
 public class UserController {
 
-    @Autowired
+    @Resource
     private UserService userService;
 
     @ApiOperation(value = "根据登录名获取用户信息", notes = "根据登录名获取用户信息", httpMethod = "GET")
@@ -58,35 +55,13 @@ public class UserController {
         } catch (Exception e) {
             return Result.errorException(e.getMessage());
         }
-
-
     }
 
     @ApiOperation(value = "删除用户", notes = "删除用户", httpMethod = "DELETE")
     @DeleteMapping("/removeUser/{id}")
     public Result removeUser(@RequestParam("userId") String userId) {
-        try {
-            userService.deleteUser(userId);
-            return Result.ok();
-        } catch (Exception e) {
-            return Result.errorException(e.getMessage());
-        }
+        userService.deleteUser(userId);
+        return Result.ok();
     }
-
-
-    @Resource
-    private SysCodeService sysCodeService;
-
-    @ApiOperation(value = "获取配置列表", notes = "获取配置列表", httpMethod = "GET")
-    @GetMapping("/sysConfig/list")
-    public Result sysConfigList() {
-        try {
-            List<SysCode> sysCodes = sysCodeService.selectSysCodeList();
-            return Result.ok(sysCodes);
-        } catch (Exception e) {
-            return Result.errorException(e.getMessage());
-        }
-    }
-
 
 }
