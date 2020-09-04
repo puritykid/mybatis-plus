@@ -1,0 +1,36 @@
+#数据源配置
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource       # 使用连接池类型
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?characterEndcoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: root
+    initialSize: 8
+    maxActive: 8
+    minIdle: 5
+    hikari:
+      connection-timeout: 30000  #等待连接池分配连接的最大时长，超过报sqlException
+      minimum-idle: 8            #最小连接数
+      maximum-pool-size:  8     #最大连接数，推荐的公式：((core_count * 2) + effective_spindle_count)
+      auto-commit: true          #自动提交
+      idle-timeout: 600000       #连接超时时间，超过指定时间自动释放
+      pool-name: HikariCP        #连接池名称
+      max-lifetime: 1800000      #连接的生命时长，超时而且没有被使用则被释放，默认30分钟
+      connection-test-query: select 1  #连接检测sql
+
+mybatis-plus:
+  type-aliases-package: com.example.mybatisplus.pojo
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      insert-strategy: not_null
+      update-strategy: not_null
+
+server:
+  port: 8888
+  tomcat:
+    uri-encoding: utf-8
